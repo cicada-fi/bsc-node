@@ -1,5 +1,5 @@
 FROM ubuntu:24.04
-ENV BSC_RELEASE=v1.4.14
+ENV BSC_RELEASE=v1.4.15
 RUN apt-get update \
     && apt-get install -y wget unzip
 RUN wget https://github.com/bnb-chain/bsc/releases/download/${BSC_RELEASE}/geth_linux -O /usr/local/bin/geth
