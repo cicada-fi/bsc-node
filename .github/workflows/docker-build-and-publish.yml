@@ -12,7 +12,8 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      IMAGE_PREFIX: ghcr.io/${{ github.repository }}/bsc-node
+      NODE_IMAGE_PREFIX: ghcr.io/${{ github.repository }}/bsc-node
+      SNAPSHOT_EXTRACTOR_IMAGE_PREFIX: ghcr.io/${{ github.repository }}/snapshot_extractor
 
     steps:
       - name: Checkout repository
@@ -53,15 +54,26 @@ jobs:
           echo "formatted_tags=$formatted_tags" >> $GITHUB_ENV
 
 
-      - name: Build and push Docker image
+      - name: Build and push Node Docker image
         uses: docker/build-push-action@v4
         with:
           context: .
           push: true
           no-cache: true
           tags: |
-            ${{ env.IMAGE_PREFIX }}:latest
+            ${{ env.NODE_IMAGE_PREFIX }}:latest
             ${{ env.formatted_tags }}
 
+      - name: Build and push Extractor Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: ./snapshot_extractor
+          push: true
+          no-cache: true
+          tags: |
+            ${{ env.SNAPSHOT_EXTRACTOR_IMAGE_PREFIX }}:latest
+            ${{ env.formatted_tags }}
+      
+
       - name: Post build info
-        run: echo "Docker image has been built and pushed to ${{ env.IMAGE_PREFIX }}:latest"
+        run: echo "Docker images has been built and pushed"
