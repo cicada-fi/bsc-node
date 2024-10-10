@@ -2,38 +2,6 @@
 set -e
 SAVE_PATH=$SAVE_DIR/$SAVE_FILE
 
-# Function to ask a yes/no question
-ask_yes_no() {
-    while true; do
-        read -p "$1 (y/n): " yn
-        case $yn in
-            [Yy]* ) return 0;;
-            [Nn]* ) return 1;;
-            * ) echo "Please answer yes or no.";;
-        esac
-    done
-}
-
-# Check if the snapshot exists
-if [ -f "$SAVE_PATH" ]; then
-  echo Snapshot $SAVE_PATH already exists:
-  ls -la $SAVE_PATH
-  if ask_yes_no "Do you want to continue and overwrite it?"; then
-    echo Removing snapshot file
-    rm -f $SAVE_PATH
-    echo Removed
-    ACT_DOWNLOAD="1"
-  else
-    echo "Keeping the existing file"
-    ACT_DOWNLOAD="0"
-    if ask_yes_no "Should we re-calculate and verify its hash?"; then
-      ACT_CHECKSUM="1"
-    else
-      ACT_CHECKSUM="0"
-    fi
-  fi
-fi
-
 # Check if the target dir exists
 if [ -d "$EXTRACT_DIR/geth" ]; then
   echo Target directory $EXTRACT_DIR/geth already exists:
@@ -47,6 +15,7 @@ if [ -d "$EXTRACT_DIR/geth" ]; then
 fi
 
 if [ "$ACT_DOWNLOAD" == "1" ]; then
+  rm -rf $SAVE_PATH
   mkdir -p $SAVE_DIR
   echo Start downloading from $DOWNLOAD_URL
   aria2c -s4 -x4 -k1024M $DOWNLOAD_URL -d $SAVE_DIR -o $SAVE_FILE
